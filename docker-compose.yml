@@ -1,0 +1,44 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:      
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: itunes
+    ports:
+      - "3307:3306"
+  webserver:
+    image: puckel/docker-airflow:1.10.7
+    build:
+      context: https://github.com/puckel/docker-airflow.git#1.10.7
+      dockerfile: Dockerfile
+      args:
+        AIRFLOW_DEPS: gcp_api,s3
+        PYTHON_DEPS: sqlalchemy==1.3.0 werkzeug==0.16.0 pyarrow==3.0.0 snowflake-connector-python snowflake-sqlalchemy mysql-connector-python requests 
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=Local
+      - FERNET_KEY=jsDPRErfv8Z_eVTnGfF8ywd19j4pyqE3NpdUBA_oRTo=
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
