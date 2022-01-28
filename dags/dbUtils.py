@@ -2,8 +2,8 @@ import snowflake.connector
 import mysql.connector
 from scripts.scripts import *
 
-PASSWORD = "Parzival5&"
-USER = 'NIKMEND56'
+PASSWORD = "XXXXXXX"
+USER = 'XXXXXX'
 ACCOUNT = 'kn12851.us-east-2.aws'
 WAREHOUSE = 'COMPUTE_WH'
 
